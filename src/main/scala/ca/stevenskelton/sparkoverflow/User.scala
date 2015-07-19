@@ -6,8 +6,6 @@ import scala.io.{ BufferedSource, Source }
 
 object User extends StackTable[User] {
 
-  val file = new File("data/Users.xml")
-  assert(file.exists)
 
   override def parseXml(x: scala.xml.Elem): User = User(
     getInt(x \ "@Id"),

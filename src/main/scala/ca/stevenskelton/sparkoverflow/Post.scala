@@ -6,9 +6,6 @@ import scala.io.{ BufferedSource, Source }
 
 object Post extends StackTable[Post] {
 
-  val file = new File("data/Posts.xml")
-  assert(file.exists)
-
   override def parseXml(x: scala.xml.Elem): Post = Post(
     getInt(x \ "@Id"),
     getInt(x \ "@PostTypeId"),

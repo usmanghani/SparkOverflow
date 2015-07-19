@@ -6,8 +6,6 @@ import scala.io.{ BufferedSource, Source }
 
 object Vote extends StackTable[Vote] {
 
-  val file = new File("data/Votes.xml")
-  assert(file.exists)
 
   override def parseXml(x: scala.xml.Elem): Vote = Vote(
     getInt(x \ "@Id"),

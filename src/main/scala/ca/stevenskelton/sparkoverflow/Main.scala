@@ -7,29 +7,43 @@ import org.apache.spark.rdd.RDD
 import org.apache.log4j.{ LogManager, Level }
 
 object Main extends App {
-  import java.io.File
 
-  val sparkHome = "C:/Program Files/Hadoop/spark-0.8.0-incubating/"
-
+  val inputDir = args(0)
+  val outputDir = args(1)
   val minSplits = 4
+
+  System.setProperty("spark.executor.memory", "5g")
+  System.setProperty("spark.rdd.compress", "true")
+
+  println("Spark starting.")
+
+  //LogManager.getRootLogger().setLevel(Level.WARN)
+  val conf = new SparkConf().setAppName("Main")
+  conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
+  .set("spark.default.parallelism", "12")
+  .set("spark.hadoop.validateOutputSpecs", "false")
+  conf.registerKryoClasses(Array(classOf[Post], classOf[User], classOf[Vote]))
+
+  val sc = new SparkContext(conf)
+
 
   //System.getenv("SPARK_HOME"),Seq(System.getenv("SPARK_EXAMPLES_JAR")))
   //LogManager.getRootLogger().setLevel(Level.WARN)
   //System.setProperty("spark.worker.memory", "3g")
-  System.setProperty("spark.executor.memory", "5g")
-  //System.setProperty("spark.rdd.compress", "true")
-  if (!true) {
-    System.setProperty("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
-    System.setProperty("spark.kryo.registrator", "ca.stevenskelton.sparkoverflow.KyroRegistrator")
-  }
+  // System.setProperty("spark.executor.memory", "5g")
+  // //System.setProperty("spark.rdd.compress", "true")
+  // if (!true) {
+  //   System.setProperty("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
+  //   System.setProperty("spark.kryo.registrator", "ca.stevenskelton.sparkoverflow.KyroRegistrator")
+  // }
 
   println("Start spark.")
-  val sc = new SparkContext("local", "Main",
-    sparkHome, List("target/scala-2.10/sparkoverflow_2.10-0.1-SNAPSHOT.jar"))
+  // val sc = new SparkContext("local", "Main",
+  //   sparkHome, List("target/scala-2.10/sparkoverflow_2.10-0.1-SNAPSHOT.jar"))
 
   println("Load data")
   //LOAD DATA USING SPARK
-  val jsonData = sc.textFile(Post.file.getAbsolutePath, minSplits)
+  val jsonData = sc.textFile(inputDir, minSplits)
   val objData = jsonData.flatMap(Post.parse)
   objData.cache
 
